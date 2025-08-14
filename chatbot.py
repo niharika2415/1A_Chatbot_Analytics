@@ -167,9 +167,12 @@ if prompt := st.chat_input("What is up?"):
             if col1.button("👍 Helpful", key="helpful"):
                 log_analytics({"timestamp": time.strftime("%Y-%m-%d %H:%M:%S"), "query": prompt, "response": bot_response, "topic": topic, "rating": "positive"})
                 st.info("Thanks for your feedback!")
+                st.rerun()
             if col2.button("👎 Not Helpful", key="not-helpful"):
                 log_analytics({"timestamp": time.strftime("%Y-%m-%d %H:%M:%S"), "query": prompt, "response": bot_response, "topic": topic, "rating": "negative"})
                 st.info("Thanks for your feedback!")
+                st.rerun()
 
     # Add bot response to chat history
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
+
