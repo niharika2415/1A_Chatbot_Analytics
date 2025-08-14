@@ -160,19 +160,34 @@ if prompt := st.chat_input("What is up?"):
     # Display bot response in chat message container
     with st.chat_message("assistant"):
         st.markdown(bot_response)
-        
-        # Add rating buttons
-        if bot_response:
-            col1, col2 = st.columns([1, 1])
-            if col1.button("👍 Helpful", key="helpful"):
-                log_analytics({"timestamp": time.strftime("%Y-%m-%d %H:%M:%S"), "query": prompt, "response": bot_response, "topic": topic, "rating": "positive"})
-                st.info("Thanks for your feedback!")
-                st.rerun()
-            if col2.button("👎 Not Helpful", key="not-helpful"):
-                log_analytics({"timestamp": time.strftime("%Y-%m-%d %H:%M:%S"), "query": prompt, "response": bot_response, "topic": topic, "rating": "negative"})
-                st.info("Thanks for your feedback!")
-                st.rerun()
 
+    # Log the interaction and add rating buttons
+    log_analytics({"timestamp": time.strftime("%Y-%m-%d %H:%M:%S"), "query": prompt, "response": bot_response, "topic": topic, "rating": "unrated"})
+    
     # Add bot response to chat history
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
+    
+    # Add a rating container to the session state so it persists across reruns
+    st.session_state.last_query = prompt
+    st.session_state.show_rating_buttons = True
+    st.session_state.feedback_message = ""
+    st.rerun()
 
+# Display rating buttons if needed
+if "show_rating_buttons" in st.session_state and st.session_state.show_rating_buttons:
+    st.divider()
+    st.write("Was this response helpful?")
+    col1, col2 = st.columns([1, 1])
+    if col1.button("👍 Helpful"):
+        log_analytics({"timestamp": time.strftime("%Y-%m-%d %H:%M:%S"), "query": st.session_state.last_query, "response": "", "topic": "", "rating": "positive"})
+        st.session_state.feedback_message = "Thanks for your feedback! The dashboard will refresh shortly."
+        st.session_state.show_rating_buttons = False
+        st.rerun()
+    if col2.button("👎 Not Helpful"):
+        log_analytics({"timestamp": time.strftime("%Y-%m-%d %H:%M:%S"), "query": st.session_state.last_query, "response": "", "topic": "", "rating": "negative"})
+        st.session_state.feedback_message = "Thanks for your feedback! The dashboard will refresh shortly."
+        st.session_state.show_rating_buttons = False
+        st.rerun()
+    
+if "feedback_message" in st.session_state and st.session_state.feedback_message:
+    st.success(st.session_state.feedback_message)
