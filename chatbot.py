@@ -8,8 +8,7 @@ import streamlit as st
 # It communicates with the Gemini API and logs interactions.
 
 # --- Configuration ---
-# You can set your API key here, or as a Streamlit secret.
-# In production, using secrets is highly recommended.
+#Setting API key here, or as a Streamlit secret.
 API_KEY = st.secrets.get("GEMINI_API_KEY")
 
 if not API_KEY:
@@ -191,3 +190,4 @@ if "show_rating_buttons" in st.session_state and st.session_state.show_rating_bu
     
 if "feedback_message" in st.session_state and st.session_state.feedback_message:
     st.success(st.session_state.feedback_message)
+
